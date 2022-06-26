@@ -1,56 +1,60 @@
 package br.com.fateczl.zikagames.dao;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
 
 import br.com.fateczl.zikagames.entity.Cliente;
+import br.com.fateczl.zikagames.util.HibernateUtil;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
 
-public class ClienteDAO implements IBaseDAO<Cliente> {
+public class ClienteDAO implements IBaseDAO<Cliente>{
 	
-	private SessionFactory sf; 
+	private SessionFactory sf;
 	
-	public ClienteDAO(SessionFactory sf) {
-		this.sf = sf;
+	public ClienteDAO() {
+		this.sf = HibernateUtil.getSessionFactory();
 	}
 	
 	@Override
 	public void adicionar(Cliente entity) {
 		EntityManager entityManager = sf.createEntityManager();
-		EntityTransaction transaction = entityManager.getTransaction();
-		transaction.begin();
+		entityManager.getTransaction().begin();
 		entityManager.persist(entity);
-		transaction.commit();
+		entityManager.getTransaction().commit();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Cliente> pesquisar(String column) {
-		List<Cliente> clientes = new ArrayList<Cliente>();
-		StringBuffer buffer = new StringBuffer();
-		buffer.append("SELECT * FROM cliente ");
-		buffer.append(" WHERE nome LIKE '%" + column + "%'");
 		EntityManager entityManager = sf.createEntityManager();
-		Query query = entityManager.createNativeQuery(buffer.toString());
-		List<Object[]> lista = query.getResultList();
-		for (Object[] obj : lista) {
-			Cliente cli = new Cliente();
-			cli.setId(Integer.parseInt(obj[0].toString()));
-			cli.setNome(obj[1].toString());
-			cli.setCpf(obj[2].toString());
-			cli.setDataNascimento(LocalDate.parse(obj[3].toString()));
-			cli.setTelefone(obj[4].toString());
-			cli.setEmail(obj[5].toString());
-			
-			clientes.add(cli);
-		}
+		StringBuffer query = new StringBuffer();
+		query.append("SELECT * FROM cliente LIKE ");
+		query.append("'%" + column + "%'");
 		
-		return clientes;
+		return entityManager.createQuery(query.toString(), Cliente.class).getResultList();
+	}
+
+	@Override
+	public Cliente pesquisarPorId(int id) {
+		EntityManager entityManager = sf.createEntityManager();
+		Cliente cliente = entityManager.find(Cliente.class, id);
+		return cliente;
+	}
+
+	@Override
+	public void atualizar(Cliente entity) {
+		EntityManager entityManager = sf.createEntityManager();
+		entityManager.getTransaction().begin();
+		entityManager.merge(entity);
+		entityManager.getTransaction().commit();
+	}
+
+	@Override
+	public void excluir(Cliente entity) {
+		EntityManager entityManager = sf.createEntityManager();
+		entityManager.getTransaction().begin();
+		entityManager.remove(entity);
+		entityManager.getTransaction().commit();
 	}
 
 }

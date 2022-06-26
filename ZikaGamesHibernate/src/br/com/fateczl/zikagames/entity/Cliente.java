@@ -15,18 +15,17 @@ import jakarta.validation.constraints.NotNull;
 public class Cliente {
 	
 	@Id
+	@Column
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	@NotNull
 	private int id;
-	
-	@Column(name = "nome", length = 80)
-	@NotNull
-	private String nome;
 	
 	@Column(name = "cpf", length = 11)
 	@NotNull
 	private String cpf;
+	
+	@Column(name = "nome", length = 80)
+	@NotNull
+	private String nome;
 	
 	@Column(name = "dataNascimento")
 	private LocalDate dataNascimento;
@@ -84,5 +83,4 @@ public class Cliente {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-		
 }

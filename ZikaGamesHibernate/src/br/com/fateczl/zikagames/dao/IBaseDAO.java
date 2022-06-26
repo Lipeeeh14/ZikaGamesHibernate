@@ -5,4 +5,7 @@ import java.util.List;
 public interface IBaseDAO<T> {
 	public void adicionar(T entity);
 	public List<T> pesquisar(String column);
+	public T pesquisarPorId(int id);
+	public void atualizar(T entity);
+	public void excluir(T entity);
 }
